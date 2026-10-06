@@ -52,7 +52,7 @@
 </main>
 
 <footer class="text-center text-xs text-gray-500 px-4 py-8 border-t border-white/5 space-y-1">
-  <p>This product uses the TMDB API but is not endorsed or certified by TMDB. Data and images courtesy of TMDB.</p>
+  <p>This product uses TMDB, Jikan, and TVMaze APIs for fallback metadata search.</p>
   <p>Streaming powered by multi-server embed integration.</p>
 </footer>
 
@@ -70,7 +70,7 @@ const HAS_KEY = TMDB_KEY && TMDB_KEY !== "YOUR_TMDB_API_KEY";
 /* ============ CATALOG ============ */
 const items = [
   {id:94605, k:"tv",    c:"anime", t:"Arcane"},
-  {id:550,    k:"movie", c:"movie", t:"Fight Club"},
+  {id:550,   k:"movie", c:"movie", t:"Fight Club"},
   {id:93405, k:"tv",    c:"drama", t:"Squid Game"},
   {id:1429,  k:"tv",    c:"anime", t:"Attack on Titan"},
   {id:157336,k:"movie", c:"movie", t:"Interstellar"},
@@ -82,8 +82,8 @@ const items = [
   {id:496243,k:"movie", c:"movie", t:"Parasite"},
   {id:66732, k:"tv",    c:"drama", t:"Stranger Things"},
   {id:13916, k:"tv",    c:"anime", t:"Death Note"},
-  {id:155,    k:"movie", c:"movie", t:"The Dark Knight"},
-  {id:129,    k:"movie", c:"anime", t:"Spirited Away"},
+  {id:155,   k:"movie", c:"movie", t:"The Dark Knight"},
+  {id:129,   k:"movie", c:"anime", t:"Spirited Away"},
   {id:1396,  k:"tv",    c:"drama", t:"Breaking Bad"}
 ];
 const TABS = [["all","All"],["movie","Movies"],["drama","Dramas"],["anime","Anime"],["trending","Trending"],["favs","Favorites"],["about","About"]];
@@ -118,76 +118,100 @@ const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;
 /* ============ STABLE MULTI-SERVER DYNAMIC URL GENERATOR ============ */
 function getStreamUrl(curItem, sN, epN, server) {
   const isTv = curItem.k === "tv";
-  const id = curItem.id;
+  const d = info[curItem.id] || {};
+  // IMDb ID থাকলে সেটি ব্যবহার করবে, অন্যথায় TMDB ID
+  const streamId = d.imdbId || curItem.id;
+  const isImdb = String(streamId).startsWith("tt");
 
   switch (server) {
     case 1:
       return isTv 
-        ? `https://vidsrc.me/embed/tv?tmdb=${id}&season=${sN}&episode=${epN}` 
-        : `https://vidsrc.me/embed/movie?tmdb=${id}`;
+        ? `https://vidsrc.me/embed/tv?${isImdb ? 'imdb' : 'tmdb'}=${streamId}&season=${sN}&episode=${epN}` 
+        : `https://vidsrc.me/embed/movie?${isImdb ? 'imdb' : 'tmdb'}=${streamId}`;
     case 2:
       return isTv 
-        ? `https://player.autoembed.cc/embed/tv/${id}/${sN}/${epN}` 
-        : `https://player.autoembed.cc/embed/movie/${id}`;
+        ? `https://player.autoembed.cc/embed/tv/${streamId}/${sN}/${epN}` 
+        : `https://player.autoembed.cc/embed/movie/${streamId}`;
     case 3:
       return isTv 
-        ? `https://vidlink.pro/tv/${id}/${sN}/${epN}` 
-        : `https://vidlink.pro/movie/${id}`;
+        ? `https://vidlink.pro/tv/${streamId}/${sN}/${epN}` 
+        : `https://vidlink.pro/movie/${streamId}`;
     case 4:
       return isTv 
-        ? `https://www.2embed.cc/embedtv/${id}&s=${sN}&e=${epN}` 
-        : `https://www.2embed.cc/embed/${id}`;
+        ? `https://www.2embed.cc/embedtv/${streamId}&s=${sN}&e=${epN}` 
+        : `https://www.2embed.cc/embed/${streamId}`;
     case 5:
       return isTv 
-        ? `https://player.smashy.stream/tv/${id}?s=${sN}&e=${epN}` 
-        : `https://player.smashy.stream/movie/${id}`;
+        ? `https://player.smashy.stream/tv/${streamId}?s=${sN}&e=${epN}` 
+        : `https://player.smashy.stream/movie/${streamId}`;
     default:
       return isTv 
-        ? `https://vidlink.pro/tv/${id}/${sN}/${epN}` 
-        : `https://vidlink.pro/movie/${id}`;
+        ? `https://vidlink.pro/tv/${streamId}/${sN}/${epN}` 
+        : `https://vidlink.pro/movie/${streamId}`;
   }
 }
 
-/* ============ TMDB API ============ */
+/* ============ TMDB & FALLBACK DATA FETCHING ============ */
 const api = (path, extra = "") =>
   fetch(`${API}${path}?api_key=${TMDB_KEY}&language=en-US${extra}`).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
 
 function get(it) {
-  return Object.assign({title: it.t, year: "", rating: "–", overview: HAS_KEY ? "Loading details…" : "Add your TMDB API key to load the synopsis.",
-    poster: null, backdrop: null, genres: [], runtime: null, seasons: []}, info[it.id]);
+  return Object.assign({
+    title: it.t, year: "", rating: "–", overview: HAS_KEY ? "Loading details…" : "Add your TMDB API key to load the synopsis.",
+    poster: null, posterUrl: null, backdrop: null, genres: [], runtime: null, seasons: []
+  }, info[it.id]);
 }
+
 async function loadItem(it) {
-  const d = await api(`/${it.k}/${it.id}`, "&append_to_response=videos&include_video_language=en,null");
-  info[it.id] = {
-    title: d.title || d.name, year: (d.release_date || d.first_air_date || "").slice(0, 4),
-    rating: d.vote_average ? d.vote_average.toFixed(1) : "–", overview: d.overview || "No synopsis available.",
-    poster: d.poster_path, backdrop: d.backdrop_path, genres: (d.genres || []).map(g => g.name),
-    runtime: d.runtime || (d.episode_run_time || [])[0] || null,
-    seasons: (d.seasons || []).filter(s => s.season_number > 0), pop: d.popularity || 0
-  };
+  // যদি Fallback API (Jikan/TVMaze) থেকে ডেটা আগেই এসে থাকে, তবে TMDB কল স্কিপ করবে
+  if (typeof it.id === "string" && (it.id.startsWith("mal_") || it.id.startsWith("tvm_"))) return;
+
+  try {
+    const d = await api(`/${it.k}/${it.id}`, "&append_to_response=videos,external_ids&include_video_language=en,null");
+    info[it.id] = {
+      title: d.title || d.name, year: (d.release_date || d.first_air_date || "").slice(0, 4),
+      rating: d.vote_average ? d.vote_average.toFixed(1) : "–", overview: d.overview || "No synopsis available.",
+      poster: d.poster_path, backdrop: d.backdrop_path, genres: (d.genres || []).map(g => g.name),
+      runtime: d.runtime || (d.episode_run_time || [])[0] || null,
+      seasons: (d.seasons || []).filter(s => s.season_number > 0), pop: d.popularity || 0,
+      imdbId: d.external_ids?.imdb_id || null
+    };
+  } catch (e) {
+    console.warn(`TMDB details fetch failed for ${it.id}`);
+  }
 }
+
 async function loadAll() {
   if (!HAS_KEY) { $("#keyBanner").classList.remove("hidden"); return; }
   await Promise.allSettled(items.map(loadItem));
   hot = Object.keys(info).map(Number).filter(id => !item(id).extra).sort((a, b) => info[b].pop - info[a].pop).slice(0, 6);
   render(); renderHero();
 }
+
 async function loadSeason(n) {
   season = n; episodes = []; epIdx = 0; drawModal();
+  if (typeof cur.id === "string" && (cur.id.startsWith("mal_") || cur.id.startsWith("tvm_"))) return;
   try { episodes = (await api(`/tv/${cur.id}/season/${n}`)).episodes || []; } catch (e) {}
   drawModal();
 }
 
 /* ============ ARTWORK FALLBACK (SVG) ============ */
 function art(title, id, w, h) {
-  const hue = (id * 47) % 360, words = title.split(" "), mid = Math.ceil(words.length / 2);
+  const numId = typeof id === "number" ? id : 123;
+  const hue = (numId * 47) % 360, words = title.split(" "), mid = Math.ceil(words.length / 2);
   const lines = words.length > 1 ? [words.slice(0, mid).join(" "), words.slice(mid).join(" ")] : words;
   const fs = w * (w > h ? 0.07 : 0.085);
   const text = lines.map((l, n) => `<tspan x='${w*0.08}' dy='${n ? fs*1.1 : 0}'>${esc(l)}</tspan>`).join("");
   const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${w} ${h}'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='hsl(${hue},70%,40%)'/><stop offset='1' stop-color='hsl(${(hue+60)%360},60%,8%)'/></linearGradient></defs><rect width='100%' height='100%' fill='url(#g)'/><text x='${w*0.08}' y='${h*0.78}' font-family='sans-serif' font-weight='800' font-size='${fs}' fill='white'>${text}</text></svg>`;
   return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
 }
-const posterUrl = it => { const d = get(it); return d.poster ? IMG + "w342" + d.poster : art(d.title, it.id, 300, 450); };
+
+const posterUrl = it => {
+  const d = get(it);
+  if (d.posterUrl) return d.posterUrl; // Direct Image URL from Fallback APIs
+  return d.poster ? IMG + "w342" + d.poster : art(d.title, it.id, 300, 450);
+};
+
 function fallback(img, id, w, h) { img.onerror = null; img.src = art(get(item(id)).title, id, w, h); }
 
 /* ============ RENDER ============ */
@@ -200,6 +224,7 @@ function visible() {
     return tabOk && (!q || remote.includes(it.id) || (d.title + " " + d.genres.join(" ") + " " + LABEL[it.c]).toLowerCase().includes(q));
   });
 }
+
 function render() {
   $("#tabs").innerHTML = TABS.map(([k, n]) =>
     `<button data-tab="${k}" class="shrink-0 h-10 px-5 rounded-full text-sm font-semibold transition ${tab === k ? "bg-crimson shadow-[0_0_16px_#e50914]" : "glass text-gray-300 hover:text-white"}">${k === "favs" ? '<i class="fa-solid fa-heart mr-1"></i>' : ""}${n}</button>`).join("");
@@ -213,7 +238,7 @@ function render() {
   $("#grid").innerHTML = list.map(it => { const d = get(it); return `
     <button data-id="${it.id}" class="card text-left rounded-xl overflow-hidden glass">
       <div class="relative aspect-[2/3] overflow-hidden bg-white/5">
-        <img src="${posterUrl(it)}" alt="${esc(d.title)} poster" loading="lazy" onerror="fallback(this,${it.id},300,450)" class="w-full h-full object-cover">
+        <img src="${posterUrl(it)}" alt="${esc(d.title)} poster" loading="lazy" onerror="fallback(this,'${it.id}',300,450)" class="w-full h-full object-cover">
         <span class="absolute top-2 right-2 glass text-electric text-[11px] font-bold px-2 py-0.5 rounded-full">${LABEL[it.c]}</span>
         <span class="absolute bottom-2 left-2 text-xs font-bold bg-black/60 px-2 py-0.5 rounded-full"><i class="fa-solid fa-star text-yellow-400"></i> ${d.rating}</span>
         ${favs.includes(it.id) ? '<i class="fa-solid fa-heart absolute bottom-2 right-2 text-crimson"></i>' : ""}
@@ -221,8 +246,9 @@ function render() {
       <div class="p-3"><h3 class="text-sm font-semibold truncate">${esc(d.title)}</h3><p class="text-xs text-gray-400">${d.year || "—"} &bull; ${esc(d.genres[0] || LABEL[it.c])}</p></div>
     </button>`; }).join("");
   $("#empty").classList.toggle("hidden", list.length > 0);
-  $("#empty").textContent = searching ? "Searching TMDB…" : tab === "favs" && !query ? "No favorites yet. Open a title and tap the heart." : "No results found. Try another title or tab.";
+  $("#empty").textContent = searching ? "Searching database & fallback APIs…" : tab === "favs" && !query ? "No favorites yet. Open a title and tap the heart." : "No results found. Try another title or tab.";
 }
+
 function drawAbout() {
   const P = PROFILE, initials = P.name.replace(/[^A-Za-z ]/g, "").split(" ").filter(Boolean).slice(0, 2).map(w => w[0]).join("");
   $("#about").innerHTML = `
@@ -246,6 +272,7 @@ function drawAbout() {
       </div>
     </div>`;
 }
+
 function renderHero() {
   const it = items[0], d = get(it);
   $("#hero").style.backgroundImage = `url("${d.backdrop ? IMG + "w1280" + d.backdrop : art(d.title, it.id, 1400, 700)}")`;
@@ -277,7 +304,7 @@ async function togglePlayerFullScreen() {
       } else if (box.webkitRequestFullscreen) {
         await box.webkitRequestFullscreen();
       }
-      
+
       if (screen.orientation && screen.orientation.lock) {
         await screen.orientation.lock('landscape').catch(() => {});
       }
@@ -311,6 +338,7 @@ function openModal(id) {
   drawModal();
   if (HAS_KEY && cur.k === "tv") loadSeason(1);
 }
+
 function closeModal() {
   if (document.fullscreenElement && document.exitFullscreen) {
     document.exitFullscreen().catch(() => {});
@@ -334,7 +362,7 @@ function drawModal() {
         <i class="fa-solid fa-expand mr-1"></i> Horizontal Fullscreen
       </button>
     </div>`;
-  
+
   const serverChips = `
     <div class="flex flex-wrap items-center gap-2 mb-3">
       <span class="text-xs text-gray-400 font-semibold mr-1">Select Server:</span>
@@ -348,15 +376,15 @@ function drawModal() {
   const seasonChips = d.seasons.length > 1 ? `<div class="flex gap-2 overflow-x-auto no-sb mb-3">${d.seasons.map(s =>
     `<button data-season="${s.season_number}" class="shrink-0 h-9 px-4 rounded-full text-sm font-semibold ${season === s.season_number ? "bg-crimson" : "glass"}">Season ${s.season_number}</button>`).join("")}</div>` : "";
   const ep = episodes[epIdx];
-  const epPanel = isTv && HAS_KEY ? `<div class="mt-5"><p class="text-sm font-semibold mb-2">Episodes</p>${seasonChips}
+  const epPanel = isTv && HAS_KEY && episodes.length > 0 ? `<div class="mt-5"><p class="text-sm font-semibold mb-2">Episodes</p>${seasonChips}
     ${ep ? `<div class="glass rounded-xl p-3 mb-3 flex gap-3">
       ${ep.still_path ? `<img src="${IMG}w300${ep.still_path}" alt="" class="w-28 h-auto rounded-lg object-cover self-start hidden sm:block">` : ""}
       <div><p class="font-semibold text-sm">S${season}E${ep.episode_number} · ${esc(ep.name)}${ep.runtime ? ` <span class="text-gray-400 font-normal">· ${ep.runtime}m</span>` : ""}</p>
       <p class="text-xs text-gray-300 mt-1">${esc(ep.overview || "No description available.")}</p>
       <p class="text-xs text-gray-500 mt-1">${ep.air_date ? "Aired " + ep.air_date : ""}</p></div></div>` : ""}
-    <div class="flex flex-wrap gap-2 max-h-40 overflow-y-auto">${episodes.length ? episodes.map((e, n) =>
-      `<button data-ep="${n}" title="${esc(e.name)}" class="h-10 min-w-[3rem] px-3 rounded-lg text-sm font-semibold ${epIdx === n ? "bg-crimson shadow-[0_0_12px_#e50914]" : "glass hover:text-electric"}">Ep ${e.episode_number}</button>`).join("")
-      : '<span class="text-sm text-gray-400">Loading episodes…</span>'}</div></div>` : "";
+    <div class="flex flex-wrap gap-2 max-h-40 overflow-y-auto">${episodes.map((e, n) =>
+      `<button data-ep="${n}" title="${esc(e.name)}" class="h-10 min-w-[3rem] px-3 rounded-lg text-sm font-semibold ${epIdx === n ? "bg-crimson shadow-[0_0_12px_#e50914]" : "glass hover:text-electric"}">Ep ${e.episode_number}</button>`).join("")}</div></div>` : "";
+  
   const meta = [LABEL[cur.c], d.year, d.runtime ? d.runtime + " min" + (isTv ? "/ep" : "") : "", d.genres.join(", ")].filter(Boolean).join(" • ");
   $("#modalBody").innerHTML = `
     ${player}
@@ -373,31 +401,118 @@ function drawModal() {
       <p class="text-gray-300 mt-3">${esc(d.overview)}</p>${epPanel}
     </div>`;
 }
+
 function toast(m) { const t = $("#toast"); t.textContent = m; t.style.opacity = 1; setTimeout(() => t.style.opacity = 0, 1700); }
 async function share() {
   const data = {title: get(cur).title, text: `Check out ${get(cur).title} on MovieBox Hub`, url: location.href};
   try { if (navigator.share) await navigator.share(data); else { await navigator.clipboard.writeText(data.url); toast("Link copied"); } } catch (e) {}
 }
 
-/* ============ LIVE TMDB SEARCH ============ */
+/* ============ LIVE MULTI-API SEARCH WITH FALLBACK ============ */
 async function remoteSearch(q) {
-  if (!HAS_KEY || q.length < 2) { remote = []; searching = false; return render(); }
+  if (q.length < 2) { remote = []; searching = false; return render(); }
   searching = true; render();
-  try {
-    const r = await api("/search/multi", `&include_adult=false&query=${encodeURIComponent(q)}`);
-    if (q !== query.trim()) return;
-    const fresh = []; remote = [];
-    (r.results || []).filter(x => (x.media_type === "movie" || x.media_type === "tv") && x.poster_path).slice(0, 15).forEach(x => {
-      let it = item(x.id);
-      if (!it) {
-        const anime = (x.genre_ids || []).includes(16) && x.original_language === "ja";
-        it = {id: x.id, k: x.media_type, c: anime ? "anime" : x.media_type === "tv" ? "drama" : "movie", t: x.title || x.name, extra: true};
-        items.push(it); fresh.push(it);
+
+  let tmdbFound = false;
+  const fresh = []; remote = [];
+
+  // ১. Primary Search: TMDB API
+  if (HAS_KEY) {
+    try {
+      const r = await api("/search/multi", `&include_adult=false&query=${encodeURIComponent(q)}`);
+      if (q !== query.trim()) return;
+      const results = (r.results || []).filter(x => (x.media_type === "movie" || x.media_type === "tv") && x.poster_path);
+      
+      if (results.length > 0) {
+        tmdbFound = true;
+        results.slice(0, 15).forEach(x => {
+          let it = item(x.id);
+          if (!it) {
+            const anime = (x.genre_ids || []).includes(16) && x.original_language === "ja";
+            it = {id: x.id, k: x.media_type, c: anime ? "anime" : x.media_type === "tv" ? "drama" : "movie", t: x.title || x.name, extra: true};
+            items.push(it); fresh.push(it);
+          }
+          if (it.k === x.media_type) remote.push(it.id);
+        });
+        await Promise.allSettled(fresh.map(loadItem));
       }
-      if (it.k === x.media_type) remote.push(it.id);
-    });
-    await Promise.allSettled(fresh.map(loadItem));
-  } catch (e) {}
+    } catch (e) {
+      console.warn("TMDB search failed, initiating fallback search...", e);
+    }
+  }
+
+  // ২. Fallback Search: TMDB-তে না পাওয়া গেলে Jikan (Anime) এবং TVMaze (Drama/TV) তে খুঁজবে
+  if (!tmdbFound && q === query.trim()) {
+
+    // Fallback A: Jikan API (অ্যানিমে সার্চের জন্য)
+    if (tab === "anime" || tab === "all") {
+      try {
+        const jikanRes = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(q)}&limit=6`);
+        const jikanData = await jikanRes.json();
+        if (jikanData.data && jikanData.data.length > 0) {
+          jikanData.data.forEach(x => {
+            const customId = "mal_" + x.mal_id;
+            let it = item(customId);
+            if (!it) {
+              it = { id: customId, k: "tv", c: "anime", t: x.title, extra: true };
+              items.push(it);
+            }
+            info[customId] = {
+              title: x.title,
+              year: x.year || (x.aired && x.aired.from ? x.aired.from.slice(0, 4) : ""),
+              rating: x.score ? x.score.toFixed(1) : "–",
+              overview: x.synopsis || "No synopsis available.",
+              posterUrl: x.images?.jpg?.large_image_url || x.images?.jpg?.image_url,
+              backdrop: null,
+              genres: (x.genres || []).map(g => g.name),
+              runtime: x.duration ? parseInt(x.duration) : null,
+              seasons: [],
+              pop: x.members || 0
+            };
+            remote.push(customId);
+          });
+        }
+      } catch (e) {
+        console.warn("Jikan Fallback Failed:", e);
+      }
+    }
+
+    // Fallback B: TVMaze API (কে-ড্রামা ও টিভি সিরিজের জন্য)
+    if (remote.length === 0 && (tab === "drama" || tab === "all" || tab === "movie")) {
+      try {
+        const tvmRes = await fetch(`https://api.tvmaze.com/search/shows?q=${encodeURIComponent(q)}`);
+        const tvmData = await tvmRes.json();
+        if (tvmData && tvmData.length > 0) {
+          tvmData.slice(0, 6).forEach(entry => {
+            const x = entry.show;
+            const customId = "tvm_" + x.id;
+            let it = item(customId);
+            if (!it) {
+              it = { id: customId, k: "tv", c: "drama", t: x.name, extra: true };
+              items.push(it);
+            }
+            info[customId] = {
+              title: x.name,
+              year: x.premiered ? x.premiered.slice(0, 4) : "",
+              rating: x.rating && x.rating.average ? x.rating.average.toFixed(1) : "–",
+              overview: x.summary ? x.summary.replace(/<[^>]*>/g, '') : "No synopsis available.",
+              posterUrl: x.image?.original || x.image?.medium,
+              backdrop: null,
+              genres: x.genres || [],
+              runtime: x.runtime || null,
+              seasons: [],
+              pop: 0,
+              imdbId: x.externals?.imdb || null
+            };
+            remote.push(customId);
+          });
+        }
+      } catch (e) {
+        console.warn("TVMaze Fallback Failed:", e);
+      }
+    }
+  }
+
   if (q === query.trim()) { searching = false; render(); }
 }
 
@@ -418,9 +533,14 @@ document.addEventListener("click", e => {
   }
   else if (seasonBtn) loadSeason(+seasonBtn.dataset.season);
   else if (epBtn) { epIdx = +epBtn.dataset.ep; drawModal(); }
-  else if (card && !card.closest("#modal")) openModal(+card.dataset.id);
+  else if (card && !card.closest("#modal")) {
+    const rawId = card.dataset.id;
+    const numId = Number(rawId);
+    openModal(isNaN(numId) ? rawId : numId);
+  }
   else if (t.id === "modal") closeModal();
 });
+
 $("#search").addEventListener("input", e => {
   query = e.target.value; if (tab === "about") tab = "all"; if (query.trim().length < 2) remote = []; render();
   clearTimeout(timer); timer = setTimeout(() => remoteSearch(query.trim()), 350);
