@@ -3,49 +3,107 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MovieBox Hub</title>
+<title>AniCine Box</title>
+
+<!-- Favicon Icon -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='128' fill='%230a0d14'/%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23e50914'/%3E%3Cstop offset='100%25' stop-color='%2300f2fe'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='24' y='24' width='464' height='464' rx='104' fill='none' stroke='url(%23g)' stroke-width='28'/%3E%3Cpolygon points='195,145 375,256 195,367' fill='url(%23g)'/%3E%3C/svg%3E">
+
+<!-- Safe Tailwind Config Setup -->
+<script>
+  window.tailwind = window.tailwind || {};
+  window.tailwind.config = { 
+    theme: { extend: { colors: { ink: '#0a0d14', crimson: '#e50914', electric: '#00f2fe' } } } 
+  };
+</script>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<script>
-  tailwind.config = { theme: { extend: { colors: { ink: '#0a0d14', crimson: '#e50914', electric: '#00f2fe' } } } };
-</script>
+
 <style>
-  body{background:#0a0d14;overflow-x:hidden}
-  .glass{background:rgba(255,255,255,.06);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.1)}
-  .card{transition:transform .3s,box-shadow .3s}
-  .card:hover{transform:translateY(-4px) scale(1.04);box-shadow:0 0 22px rgba(229,9,20,.55),0 0 38px rgba(0,242,254,.22)}
-  .card img{transition:transform .5s}.card:hover img{transform:scale(1.08)}
-  .glow{filter:drop-shadow(0 0 8px #e50914)}
-  .no-sb{scrollbar-width:none}.no-sb::-webkit-scrollbar{display:none}
-  .pop{animation:pop .25s ease}@keyframes pop{from{opacity:0;transform:scale(.96) translateY(14px)}to{opacity:1;transform:none}}
-  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  /* Base Fallback Colors & Reset */
+  .bg-ink { background-color: #0a0d14; }
+  .text-crimson { color: #e50914; }
+  .bg-crimson { background-color: #e50914; }
+  .text-electric { color: #00f2fe; }
+
+  body { background: #0a0d14; color: #ffffff; overflow-x: hidden; transition: background-color 0.3s ease, color 0.3s ease; min-height: 100vh; margin: 0; }
+  .glass { background: rgba(255,255,255,.06); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,.1); transition: all 0.3s ease; }
+  .card { transition: transform .3s, box-shadow .3s; }
+  .card:hover { transform: translateY(-4px) scale(1.04); box-shadow: 0 0 22px rgba(229,9,20,.55), 0 0 38px rgba(0,242,254,.22); }
+  .card img { transition: transform .5s; } .card:hover img { transform: scale(1.08); }
+  .glow { filter: drop-shadow(0 0 8px #e50914); }
+  .no-sb { scrollbar-width: none; } .no-sb::-webkit-scrollbar { display: none; }
+  .pop { animation: pop .25s ease; } @keyframes pop { from { opacity: 0; transform: scale(.96) translateY(14px); } to { opacity: 1; transform: none; } }
+
+  /* Light Theme Styles */
+  body.light-theme { background: #f8fafc !important; color: #0f172a !important; }
+  body.light-theme .glass { background: rgba(255, 255, 255, 0.85) !important; border-color: rgba(0, 0, 0, 0.08) !important; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04); }
+  body.light-theme .text-white { color: #0f172a !important; }
+  body.light-theme .text-gray-300 { color: #334155 !important; }
+  body.light-theme .text-gray-400 { color: #64748b !important; }
+  body.light-theme .text-gray-500 { color: #94a3b8 !important; }
+  body.light-theme .text-crimson { color: #00e676 !important; }
+  body.light-theme .glow { filter: drop-shadow(0 0 8px #00e676) !important; }
+  body.light-theme .bg-crimson { background-color: #00e676 !important; color: #0a0d14 !important; font-weight: 700; }
+  body.light-theme .border-crimson\/40 { border-color: rgba(0, 230, 118, 0.4) !important; }
+  body.light-theme .bg-crimson\/20 { background-color: rgba(0, 230, 118, 0.15) !important; color: #0f172a !important; }
+  body.light-theme .text-electric { color: #059669 !important; }
+  body.light-theme .focus\:border-electric:focus { border-color: #00e676 !important; }
+  body.light-theme .bg-white\/10 { background-color: rgba(0, 0, 0, 0.05) !important; color: #0f172a !important; }
+  body.light-theme .placeholder-gray-400::placeholder { color: #94a3b8 !important; }
+  body.light-theme .card:hover { box-shadow: 0 0 22px rgba(0, 230, 118, 0.55), 0 0 38px rgba(5, 150, 105, 0.22) !important; }
+  body.light-theme #modalBody { background-color: #ffffff !important; color: #0f172a !important; }
+  body.light-theme footer { border-color: rgba(0,0,0,0.08) !important; color: #64748b !important; }
+
+  /* Hero Banner Text Legibility Fix for Light Theme */
+  body.light-theme #hero h1 { color: #ffffff !important; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85); }
+  body.light-theme #hero p { color: #f1f5f9 !important; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.85); }
+  body.light-theme #hero .glass { background: rgba(15, 23, 42, 0.65) !important; border-color: rgba(255, 255, 255, 0.2) !important; color: #ffffff !important; }
+  body.light-theme #hero .text-electric { color: #00f2fe !important; }
+
+  /* Auto-hide Fullscreen Button Styles */
+  #playerFsBtn {
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+    opacity: 1;
+    visibility: visible;
+  }
+  #playerFsBtn.hidden-btn {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
 </style>
 </head>
-<body class="text-white font-sans">
+<body class="font-sans">
 
 <header class="sticky top-0 z-40 glass border-x-0 border-t-0">
   <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
     <a href="#" class="flex items-center gap-2 font-extrabold text-lg shrink-0">
       <i class="fa-solid fa-circle-play text-crimson glow text-2xl"></i>
-      <span>MovieBox <span class="text-electric">Hub</span></span>
+      <span>AniCine <span class="text-electric">Box</span></span>
     </a>
-    <div class="relative flex-1 max-w-md ml-auto">
-      <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-      <input id="search" type="search" placeholder="Search titles, genres…" autocomplete="off"
-        class="w-full h-11 pl-10 pr-4 rounded-full bg-white/10 border border-white/10 outline-none focus:border-electric text-sm placeholder-gray-400">
+    <div class="relative flex-1 max-w-md ml-auto flex items-center gap-2">
+      <div class="relative w-full">
+        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+        <input id="search" type="search" placeholder="Search titles, genres…" autocomplete="off"
+          class="w-full h-11 pl-10 pr-4 rounded-full bg-white/10 border border-white/10 outline-none focus:border-electric text-sm placeholder-gray-400">
+      </div>
+      <!-- Mode Toggle Button -->
+      <button id="themeToggle" aria-label="Toggle Theme" class="shrink-0 w-11 h-11 rounded-full glass flex items-center justify-center text-lg hover:scale-105 transition">
+        <i id="themeIcon" class="fa-solid fa-moon text-emerald-500"></i>
+      </button>
     </div>
   </div>
-  <nav id="tabs" class="max-w-7xl mx-auto px-4 pb-3 flex gap-2 overflow-x-auto no-sb"></nav>
+  <nav id="tabs" class="max-w-7xl mx-auto px-4 pb-3 flex gap-2 overflow-x-auto no-sb items-center"></nav>
 </header>
 
 <div id="keyBanner" class="hidden bg-crimson/20 border-b border-crimson/40 text-sm text-center px-4 py-2">
   Add your free TMDB API key to <b>TMDB_KEY</b> in the script to load real posters, info, and episodes.
 </div>
 
-<section id="hero" class="relative min-h-[62vh] flex items-end bg-cover bg-center"></section>
+<section id="hero" class="relative min-h-[50vh] sm:min-h-[62vh] flex items-end bg-cover bg-center"></section>
 
 <main class="max-w-7xl mx-auto px-4 py-6">
-  <h2 id="heading" class="text-xl font-bold mb-4"></h2>
+  <h2 id="heading" class="text-xl font-bold mb-4">Catalog</h2>
   <div id="grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
   <p id="empty" class="hidden text-center text-gray-400 py-16"></p>
   <section id="about" class="hidden"></section>
@@ -62,12 +120,15 @@
 <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-white text-black text-sm font-semibold px-5 py-2 rounded-full opacity-0 pointer-events-none transition-opacity"></div>
 
 <script>
-/* ============ SETTINGS ============ */
+/* ============ SAFE STORAGE UTILITY ============ */
+function safeGet(k, d = null) { try { return localStorage.getItem(k) ?? d; } catch(e) { return d; } }
+function safeSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
+
+/* ============ SETTINGS & DATA ============ */
 const TMDB_KEY = "91ed6b7b163052c7f5fc71d5e198a4ef";
 const API = "https://api.themoviedb.org/3", IMG = "https://image.tmdb.org/t/p/";
 const HAS_KEY = TMDB_KEY && TMDB_KEY !== "YOUR_TMDB_API_KEY";
 
-/* ============ CATALOG ============ */
 const items = [
   {id:94605, k:"tv",    c:"anime", t:"Arcane"},
   {id:550,   k:"movie", c:"movie", t:"Fight Club"},
@@ -86,10 +147,19 @@ const items = [
   {id:129,   k:"movie", c:"anime", t:"Spirited Away"},
   {id:1396,  k:"tv",    c:"drama", t:"Breaking Bad"}
 ];
-const TABS = [["all","All"],["movie","Movies"],["drama","Dramas"],["anime","Anime"],["trending","Trending"],["favs","Favorites"],["about","About"]];
+
+const TABS = [
+  ["all", "All", "fa-solid fa-border-all"],
+  ["movie", "Movies", "fa-solid fa-film"],
+  ["drama", "Dramas", "fa-solid fa-tv"],
+  ["anime", "Anime", "fa-solid fa-wand-magic-sparkles"],
+  ["trending", "Trending", "fa-solid fa-fire"],
+  ["favs", "Favorites", "fa-solid fa-heart"],
+  ["about", "About", "fa-solid fa-user"]
+];
+
 const LABEL = {movie:"Movie", drama:"Drama", anime:"Anime"};
 
-/* ============ ABOUT PROFILE ============ */
 const PROFILE = {
   photo: "https://ibb.co.com/Mkm12LGz",
   name: "MD. Emon Hasan",
@@ -102,24 +172,56 @@ const PROFILE = {
   ]
 };
 
-/* ============ STATE ============ */
+/* ============ STATE & HELPERS ============ */
 let tab = "all", query = "", cur = null, season = 1, episodes = [], epIdx = 0, currentServer = 3;
 const info = {};
 let hot = [];
 let remote = [], searching = false, timer;
-let favs = [];
-try { favs = JSON.parse(localStorage.getItem("mbh_favs_tmdb")) || []; } catch (e) {}
-const saveFavs = () => { try { localStorage.setItem("mbh_favs_tmdb", JSON.stringify(favs)); localStorage.setItem("mbh_extra", JSON.stringify(items.filter(i => i.extra && favs.includes(i.id)))); } catch (e) {} };
+
 const $ = s => document.querySelector(s);
-const item = id => items.find(i => i.id === id);
-try { (JSON.parse(localStorage.getItem("mbh_extra")) || []).forEach(x => { if (!item(x.id)) items.push(x); }); } catch (e) {}
+const item = id => items.find(i => String(i.id) === String(id));
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-/* ============ STABLE MULTI-SERVER DYNAMIC URL GENERATOR ============ */
+let favs = [];
+try { favs = JSON.parse(safeGet("mbh_favs_tmdb", "[]")) || []; } catch (e) { favs = []; }
+const saveFavs = () => {
+  safeSet("mbh_favs_tmdb", JSON.stringify(favs));
+  safeSet("mbh_extra", JSON.stringify(items.filter(i => i.extra && favs.some(f => String(f) === String(i.id)))));
+};
+
+try { (JSON.parse(safeGet("mbh_extra", "[]")) || []).forEach(x => { if (x && !item(x.id)) items.push(x); }); } catch (e) {}
+
+/* ============ THEME TOGGLE ============ */
+function applyTheme(theme) {
+  const icon = $("#themeIcon");
+  if (theme === "light") {
+    document.body.classList.add("light-theme");
+    if (icon) icon.className = "fa-solid fa-sun text-amber-400";
+  } else {
+    document.body.classList.remove("light-theme");
+    if (icon) icon.className = "fa-solid fa-moon text-emerald-500";
+  }
+}
+
+function initTheme() {
+  const savedTheme = safeGet("mbh_theme", "dark");
+  applyTheme(savedTheme);
+  const btn = $("#themeToggle");
+  if (btn) {
+    btn.onclick = () => {
+      const isLight = document.body.classList.contains("light-theme");
+      const nextTheme = isLight ? "dark" : "light";
+      safeSet("mbh_theme", nextTheme);
+      applyTheme(nextTheme);
+    };
+  }
+}
+
+/* ============ STREAM GENERATOR ============ */
 function getStreamUrl(curItem, sN, epN, server) {
+  if (!curItem) return "";
   const isTv = curItem.k === "tv";
   const d = info[curItem.id] || {};
-  // IMDb ID থাকলে সেটি ব্যবহার করবে, অন্যথায় TMDB ID
   const streamId = d.imdbId || curItem.id;
   const isImdb = String(streamId).startsWith("tt");
 
@@ -151,21 +253,29 @@ function getStreamUrl(curItem, sN, epN, server) {
   }
 }
 
-/* ============ TMDB & FALLBACK DATA FETCHING ============ */
+/* ============ DATA FETCHING ============ */
 const api = (path, extra = "") =>
   fetch(`${API}${path}?api_key=${TMDB_KEY}&language=en-US${extra}`).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
 
 function get(it) {
-  return Object.assign({
-    title: it.t, year: "", rating: "–", overview: HAS_KEY ? "Loading details…" : "Add your TMDB API key to load the synopsis.",
-    poster: null, posterUrl: null, backdrop: null, genres: [], runtime: null, seasons: []
-  }, info[it.id]);
+  if (!it) return { title: "Unknown", year: "", rating: "–", overview: "", poster: null, posterUrl: null, backdrop: null, genres: [], runtime: null, seasons: [] };
+  const d = info[it.id] || {};
+  return {
+    title: d.title || it.t || "Untitled",
+    year: d.year || "",
+    rating: d.rating || "–",
+    overview: d.overview || (HAS_KEY ? "Loading details…" : "Add your TMDB API key to load synopsis."),
+    poster: d.poster || null,
+    posterUrl: d.posterUrl || null,
+    backdrop: d.backdrop || null,
+    genres: Array.isArray(d.genres) ? d.genres : [],
+    runtime: d.runtime || null,
+    seasons: Array.isArray(d.seasons) ? d.seasons : []
+  };
 }
 
 async function loadItem(it) {
-  // যদি Fallback API (Jikan/TVMaze) থেকে ডেটা আগেই এসে থাকে, তবে TMDB কল স্কিপ করবে
-  if (typeof it.id === "string" && (it.id.startsWith("mal_") || it.id.startsWith("tvm_"))) return;
-
+  if (!it || (typeof it.id === "string" && (it.id.startsWith("mal_") || it.id.startsWith("tvm_")))) return;
   try {
     const d = await api(`/${it.k}/${it.id}`, "&append_to_response=videos,external_ids&include_video_language=en,null");
     info[it.id] = {
@@ -176,29 +286,28 @@ async function loadItem(it) {
       seasons: (d.seasons || []).filter(s => s.season_number > 0), pop: d.popularity || 0,
       imdbId: d.external_ids?.imdb_id || null
     };
-  } catch (e) {
-    console.warn(`TMDB details fetch failed for ${it.id}`);
-  }
+  } catch (e) {}
 }
 
 async function loadAll() {
-  if (!HAS_KEY) { $("#keyBanner").classList.remove("hidden"); return; }
+  if (!HAS_KEY) { if ($("#keyBanner")) $("#keyBanner").classList.remove("hidden"); return; }
   await Promise.allSettled(items.map(loadItem));
-  hot = Object.keys(info).map(Number).filter(id => !item(id).extra).sort((a, b) => info[b].pop - info[a].pop).slice(0, 6);
+  hot = Object.keys(info).map(Number).filter(id => item(id) && !item(id).extra).sort((a, b) => (info[b]?.pop || 0) - (info[a]?.pop || 0)).slice(0, 6);
   render(); renderHero();
 }
 
 async function loadSeason(n) {
   season = n; episodes = []; epIdx = 0; drawModal();
-  if (typeof cur.id === "string" && (cur.id.startsWith("mal_") || cur.id.startsWith("tvm_"))) return;
+  if (!cur || (typeof cur.id === "string" && (cur.id.startsWith("mal_") || cur.id.startsWith("tvm_")))) return;
   try { episodes = (await api(`/tv/${cur.id}/season/${n}`)).episodes || []; } catch (e) {}
   drawModal();
 }
 
 /* ============ ARTWORK FALLBACK (SVG) ============ */
 function art(title, id, w, h) {
-  const numId = typeof id === "number" ? id : 123;
-  const hue = (numId * 47) % 360, words = title.split(" "), mid = Math.ceil(words.length / 2);
+  const safeTitle = String(title || "MovieBox");
+  const numId = typeof id === "number" ? id : (parseInt(String(id).replace(/\D/g, "")) || 123);
+  const hue = (numId * 47) % 360, words = safeTitle.split(" "), mid = Math.ceil(words.length / 2);
   const lines = words.length > 1 ? [words.slice(0, mid).join(" "), words.slice(mid).join(" ")] : words;
   const fs = w * (w > h ? 0.07 : 0.085);
   const text = lines.map((l, n) => `<tspan x='${w*0.08}' dy='${n ? fs*1.1 : 0}'>${esc(l)}</tspan>`).join("");
@@ -208,149 +317,234 @@ function art(title, id, w, h) {
 
 const posterUrl = it => {
   const d = get(it);
-  if (d.posterUrl) return d.posterUrl; // Direct Image URL from Fallback APIs
+  if (d.posterUrl) return d.posterUrl;
   return d.poster ? IMG + "w342" + d.poster : art(d.title, it.id, 300, 450);
 };
 
-function fallback(img, id, w, h) { img.onerror = null; img.src = art(get(item(id)).title, id, w, h); }
+function fallback(img, id, w, h) { img.onerror = null; const it = item(id); img.src = art(it ? get(it).title : "Title", id, w, h); }
 
-/* ============ RENDER ============ */
+/* ============ RENDER LOGIC ============ */
 function visible() {
   const q = query.trim().toLowerCase();
   return items.filter(it => {
+    if (!it) return false;
     const d = get(it);
-    const tabOk = tab === "all" || tab === it.c || (tab === "trending" && hot.includes(it.id)) || (tab === "favs" && favs.includes(it.id));
-    if (it.extra && !favs.includes(it.id) && !(q && remote.includes(it.id))) return false;
-    return tabOk && (!q || remote.includes(it.id) || (d.title + " " + d.genres.join(" ") + " " + LABEL[it.c]).toLowerCase().includes(q));
+    const tabOk = tab === "all" || tab === it.c || (tab === "trending" && hot.includes(Number(it.id))) || (tab === "favs" && favs.some(f => String(f) === String(it.id)));
+    if (it.extra && !favs.some(f => String(f) === String(it.id)) && !(q && remote.some(r => String(r) === String(it.id)))) return false;
+    const searchString = `${d.title} ${(d.genres||[]).join(" ")} ${LABEL[it.c] || ""}`.toLowerCase();
+    return tabOk && (!q || remote.some(r => String(r) === String(it.id)) || searchString.includes(q));
   });
 }
 
 function render() {
-  $("#tabs").innerHTML = TABS.map(([k, n]) =>
-    `<button data-tab="${k}" class="shrink-0 h-10 px-5 rounded-full text-sm font-semibold transition ${tab === k ? "bg-crimson shadow-[0_0_16px_#e50914]" : "glass text-gray-300 hover:text-white"}">${k === "favs" ? '<i class="fa-solid fa-heart mr-1"></i>' : ""}${n}</button>`).join("");
+  const tabsNav = $("#tabs");
+  if (tabsNav) {
+    tabsNav.innerHTML = TABS.map(([k, n, icon]) =>
+      `<button data-tab="${k}" class="shrink-0 h-10 px-4 rounded-full text-sm font-semibold inline-flex items-center justify-center gap-2 transition ${tab === k ? "bg-crimson shadow-[0_0_16px_#e50914] text-white" : "glass text-gray-300 hover:text-white"}"><i class="${icon} text-xs"></i><span>${n}</span></button>`
+    ).join("");
+  }
+  
   const isAbout = tab === "about";
-  $("#about").classList.toggle("hidden", !isAbout);
-  $("#heading").classList.toggle("hidden", isAbout);
-  $("#grid").classList.toggle("hidden", isAbout);
-  if (isAbout) { $("#empty").classList.add("hidden"); drawAbout(); return; }
+  if ($("#about")) $("#about").classList.toggle("hidden", !isAbout);
+  if ($("#heading")) $("#heading").classList.toggle("hidden", isAbout);
+  if ($("#grid")) $("#grid").classList.toggle("hidden", isAbout);
+
+  if (isAbout) { if ($("#empty")) $("#empty").classList.add("hidden"); drawAbout(); return; }
+
   const list = visible();
-  $("#heading").textContent = `${TABS.find(t => t[0] === tab)[1]} (${list.length})`;
-  $("#grid").innerHTML = list.map(it => { const d = get(it); return `
-    <button data-id="${it.id}" class="card text-left rounded-xl overflow-hidden glass">
-      <div class="relative aspect-[2/3] overflow-hidden bg-white/5">
-        <img src="${posterUrl(it)}" alt="${esc(d.title)} poster" loading="lazy" onerror="fallback(this,'${it.id}',300,450)" class="w-full h-full object-cover">
-        <span class="absolute top-2 right-2 glass text-electric text-[11px] font-bold px-2 py-0.5 rounded-full">${LABEL[it.c]}</span>
-        <span class="absolute bottom-2 left-2 text-xs font-bold bg-black/60 px-2 py-0.5 rounded-full"><i class="fa-solid fa-star text-yellow-400"></i> ${d.rating}</span>
-        ${favs.includes(it.id) ? '<i class="fa-solid fa-heart absolute bottom-2 right-2 text-crimson"></i>' : ""}
-      </div>
-      <div class="p-3"><h3 class="text-sm font-semibold truncate">${esc(d.title)}</h3><p class="text-xs text-gray-400">${d.year || "—"} &bull; ${esc(d.genres[0] || LABEL[it.c])}</p></div>
-    </button>`; }).join("");
-  $("#empty").classList.toggle("hidden", list.length > 0);
-  $("#empty").textContent = searching ? "Searching database & fallback APIs…" : tab === "favs" && !query ? "No favorites yet. Open a title and tap the heart." : "No results found. Try another title or tab.";
+  const currentTabName = (TABS.find(t => t[0] === tab) || ["","All"])[1];
+  if ($("#heading")) $("#heading").textContent = `${currentTabName} (${list.length})`;
+
+  if ($("#grid")) {
+    $("#grid").innerHTML = list.map(it => {
+      const d = get(it);
+      const isFav = favs.some(f => String(f) === String(it.id));
+      return `
+      <button data-id="${it.id}" class="card text-left rounded-xl overflow-hidden glass">
+        <div class="relative aspect-[2/3] overflow-hidden bg-white/5">
+          <img src="${posterUrl(it)}" alt="${esc(d.title)}" loading="lazy" onerror="fallback(this,'${it.id}',300,450)" class="w-full h-full object-cover">
+          <span class="absolute top-2 right-2 glass text-electric text-[11px] font-bold px-2 py-0.5 rounded-full">${LABEL[it.c] || 'Media'}</span>
+          <span class="absolute bottom-2 left-2 text-xs font-bold bg-black/60 px-2 py-0.5 rounded-full text-white"><i class="fa-solid fa-star text-yellow-400"></i> ${d.rating}</span>
+          ${isFav ? '<i class="fa-solid fa-heart absolute bottom-2 right-2 text-crimson"></i>' : ""}
+        </div>
+        <div class="p-3">
+          <h3 class="text-sm font-semibold truncate">${esc(d.title)}</h3>
+          <p class="text-xs text-gray-400">${d.year || "—"} &bull; ${esc((d.genres && d.genres[0]) || LABEL[it.c] || 'Media')}</p>
+        </div>
+      </button>`;
+    }).join("");
+  }
+
+  if ($("#empty")) {
+    $("#empty").classList.toggle("hidden", list.length > 0);
+    $("#empty").textContent = searching ? "Searching database & fallback APIs…" : tab === "favs" && !query ? "No favorites yet. Open a title and tap the heart." : "No results found. Try another title or tab.";
+  }
 }
 
 function drawAbout() {
   const P = PROFILE, initials = P.name.replace(/[^A-Za-z ]/g, "").split(" ").filter(Boolean).slice(0, 2).map(w => w[0]).join("");
-  $("#about").innerHTML = `
-    <div class="relative max-w-xl mx-auto mt-4">
-      <div class="absolute -inset-4 rounded-[2rem] bg-gradient-to-tr from-crimson/30 to-electric/25 blur-2xl"></div>
-      <div class="glass relative rounded-3xl p-6 sm:p-10 text-center">
-        <div class="mx-auto w-36 h-36 sm:w-40 sm:h-40 rounded-full p-[3px] bg-gradient-to-tr from-crimson via-crimson to-electric shadow-[0_0_28px_rgba(229,9,20,.6),0_0_44px_rgba(0,242,254,.35)]">
-          <div class="relative w-full h-full rounded-full overflow-hidden glass bg-ink flex items-center justify-center text-4xl font-extrabold text-electric">
-            ${esc(initials)}
-            <img src="${esc(P.photo)}" alt="${esc(P.name)}" referrerpolicy="no-referrer" onerror="this.remove()" class="absolute inset-0 w-full h-full object-cover">
+  if ($("#about")) {
+    $("#about").innerHTML = `
+      <div class="relative max-w-xl mx-auto mt-4">
+        <div class="absolute -inset-4 rounded-[2rem] bg-gradient-to-tr from-crimson/30 to-electric/25 blur-2xl"></div>
+        <div class="glass relative rounded-3xl p-6 sm:p-10 text-center">
+          <div class="mx-auto w-36 h-36 sm:w-40 sm:h-40 rounded-full p-[3px] bg-gradient-to-tr from-crimson via-crimson to-electric shadow-[0_0_28px_rgba(229,9,20,.6),0_0_44px_rgba(0,242,254,.35)]">
+            <div class="relative w-full h-full rounded-full overflow-hidden glass bg-ink flex items-center justify-center text-4xl font-extrabold text-electric">
+              ${esc(initials)}
+              <img src="${esc(P.photo)}" alt="${esc(P.name)}" referrerpolicy="no-referrer" onerror="this.remove()" class="absolute inset-0 w-full h-full object-cover">
+            </div>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold mt-5">${esc(P.name)}</h2>
+          <p class="text-electric font-semibold text-sm sm:text-base mt-1">${esc(P.title)}</p>
+          <p class="text-gray-300 mt-4 leading-relaxed">${esc(P.bio)}</p>
+          <div class="flex flex-wrap justify-center gap-3 mt-7">
+            ${P.links.map(l => `<a href="${esc(l.url)}" ${l.url.startsWith("mailto:") ? "" : 'target="_blank" rel="noopener noreferrer"'}
+              class="glass h-12 px-5 rounded-full inline-flex items-center gap-2 text-sm font-semibold transition hover:text-electric hover:shadow-[0_0_18px_rgba(0,242,254,.45)] hover:-translate-y-0.5">
+              <i class="${l.icon}"></i>${esc(l.label)}</a>`).join("")}
           </div>
         </div>
-        <h2 class="text-2xl sm:text-3xl font-extrabold mt-5">${esc(P.name)}</h2>
-        <p class="text-electric font-semibold text-sm sm:text-base mt-1">${esc(P.title)}</p>
-        <p class="text-gray-300 mt-4 leading-relaxed">${esc(P.bio)}</p>
-        <div class="flex flex-wrap justify-center gap-3 mt-7">
-          ${P.links.map(l => `<a href="${esc(l.url)}" ${l.url.startsWith("mailto:") ? "" : 'target="_blank" rel="noopener noreferrer"'}
-            class="glass h-12 px-5 rounded-full inline-flex items-center gap-2 text-sm font-semibold transition hover:text-electric hover:shadow-[0_0_18px_rgba(0,242,254,.45)] hover:-translate-y-0.5">
-            <i class="${l.icon}"></i>${esc(l.label)}</a>`).join("")}
-        </div>
-      </div>
-    </div>`;
+      </div>`;
+  }
 }
+
+/* ============ DYNAMIC HERO AUTO-SLIDER ============ */
+let heroIndex = 0;
+let heroTimer = null;
 
 function renderHero() {
-  const it = items[0], d = get(it);
-  $("#hero").style.backgroundImage = `url("${d.backdrop ? IMG + "w1280" + d.backdrop : art(d.title, it.id, 1400, 700)}")`;
-  $("#hero").innerHTML = `
+  const heroSec = $("#hero");
+  if (!heroSec || items.length === 0) return;
+
+  const featured = items.slice(0, 5);
+  const it = featured[heroIndex] || items[0];
+  const d = get(it);
+
+  heroSec.style.backgroundImage = `url("${d.backdrop ? IMG + "w1280" + d.backdrop : art(d.title, it.id, 1400, 700)}")`;
+  heroSec.style.transition = "background-image 0.8s ease-in-out";
+
+  heroSec.innerHTML = `
     <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/60 to-transparent"></div>
     <div class="absolute inset-0 bg-gradient-to-r from-ink/80 to-transparent"></div>
-    <div class="relative max-w-7xl mx-auto w-full px-4 pb-10">
+    <div class="relative max-w-7xl mx-auto w-full px-4 pb-10 pt-20">
       <div class="flex flex-wrap gap-2 mb-3 text-xs font-bold">
-        <span class="bg-crimson px-2 py-1 rounded">${LABEL[it.c]}</span>
+        <span class="bg-crimson px-2 py-1 rounded">${LABEL[it.c] || 'Featured'}</span>
         <span class="glass px-2 py-1 rounded"><i class="fa-solid fa-star text-yellow-400"></i> TMDB ${d.rating}</span>
         ${d.year ? `<span class="glass px-2 py-1 rounded">${d.year}</span>` : ""}
-        ${d.genres.slice(0, 2).map(g => `<span class="glass text-electric px-2 py-1 rounded">${esc(g)}</span>`).join("")}
+        ${(d.genres||[]).slice(0, 2).map(g => `<span class="glass text-electric px-2 py-1 rounded">${esc(g)}</span>`).join("")}
       </div>
-      <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight">${esc(d.title)}</h1>
-      <p class="max-w-lg text-gray-300 my-4 line-clamp-3">${esc(d.overview)}</p>
-      <button data-id="${it.id}" class="h-12 px-8 rounded-full bg-crimson font-bold shadow-[0_0_24px_#e50914] hover:scale-105 transition"><i class="fa-solid fa-play mr-2"></i>Watch Now</button>
+      <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight transition-all">${esc(d.title)}</h1>
+      <p class="max-w-lg text-gray-300 my-4 line-clamp-3 text-sm sm:text-base">${esc(d.overview)}</p>
+      
+      <div class="flex items-center gap-4">
+        <button data-id="${it.id}" class="h-11 sm:h-12 px-7 sm:px-8 rounded-full bg-crimson font-bold shadow-[0_0_24px_#e50914] hover:scale-105 transition"><i class="fa-solid fa-play mr-2"></i>Watch Now</button>
+      </div>
+
+      <!-- Slider Indicator Dots -->
+      <div class="flex gap-2 mt-6">
+        ${featured.map((_, i) => `
+          <button onclick="changeHeroSlide(${i})" aria-label="Slide ${i+1}" class="h-2 rounded-full transition-all duration-300 ${i === heroIndex ? "w-8 bg-crimson shadow-[0_0_10px_#e50914]" : "w-2 bg-white/30 hover:bg-white/60"}"></button>
+        `).join("")}
+      </div>
     </div>`;
+
+  startHeroTimer();
 }
 
-/* ============ CUSTOM HORIZONTAL LANDSCAPE FULLSCREEN FUNCTION ============ */
+function changeHeroSlide(idx) {
+  heroIndex = idx;
+  renderHero();
+}
+
+function startHeroTimer() {
+  if (heroTimer) clearInterval(heroTimer);
+  heroTimer = setInterval(() => {
+    const total = Math.min(items.length, 5);
+    if (total > 0) {
+      heroIndex = (heroIndex + 1) % total;
+      renderHero();
+    }
+  }, 5000);
+}
+
+/* ============ LANDSCAPE FULLSCREEN ============ */
 async function togglePlayerFullScreen() {
   const box = document.getElementById("playerBox");
   if (!box) return;
-
   if (!document.fullscreenElement && !document.webkitFullscreenElement) {
     try {
-      if (box.requestFullscreen) {
-        await box.requestFullscreen();
-      } else if (box.webkitRequestFullscreen) {
-        await box.webkitRequestFullscreen();
-      }
-
-      if (screen.orientation && screen.orientation.lock) {
-        await screen.orientation.lock('landscape').catch(() => {});
-      }
-    } catch (err) {
-      console.log("Fullscreen/Orientation error:", err);
-    }
+      if (box.requestFullscreen) await box.requestFullscreen();
+      else if (box.webkitRequestFullscreen) await box.webkitRequestFullscreen();
+      if (screen.orientation && screen.orientation.lock) await screen.orientation.lock('landscape').catch(() => {});
+    } catch (err) {}
   } else {
-    if (screen.orientation && screen.orientation.unlock) {
-      screen.orientation.unlock();
-    }
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    } else if (document.webkitExitFullscreen) {
-      document.webkitExitFullscreen();
-    }
+    if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
+    if (document.exitFullscreen) document.exitFullscreen();
+    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
   }
 }
 
-document.addEventListener("fullscreenchange", () => {
-  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-    if (screen.orientation && screen.orientation.unlock) {
-      screen.orientation.unlock();
+/* ============ AUTO-HIDE FULLSCREEN BUTTON LOGIC ============ */
+let fsBtnTimeout = null;
+
+function resetFsBtnTimer() {
+  const btn = document.getElementById("playerFsBtn");
+  if (!btn) return;
+  btn.classList.remove("hidden-btn");
+  clearTimeout(fsBtnTimeout);
+  fsBtnTimeout = setTimeout(() => {
+    const currentBtn = document.getElementById("playerFsBtn");
+    if (currentBtn) currentBtn.classList.add("hidden-btn");
+  }, 5000);
+}
+
+['touchstart', 'mousemove', 'click', 'keydown', 'scroll'].forEach(evt => {
+  window.addEventListener(evt, () => {
+    const modal = document.getElementById("modal");
+    if (modal && !modal.classList.contains("hidden")) {
+      resetFsBtnTimer();
     }
-  }
+  }, { passive: true });
 });
 
-/* ============ IN-WEBSITE EMBEDDED MODAL ============ */
+/* ============ EMBEDDED MODAL ============ */
 function openModal(id) {
   cur = item(id); season = 1; episodes = []; epIdx = 0; currentServer = 3;
-  $("#modal").classList.remove("hidden"); document.body.style.overflow = "hidden";
+  if ($("#modal")) $("#modal").classList.remove("hidden");
+  document.body.style.overflow = "hidden";
   drawModal();
-  if (HAS_KEY && cur.k === "tv") loadSeason(1);
+  if (HAS_KEY && cur && cur.k === "tv") loadSeason(1);
 }
 
 function closeModal() {
-  if (document.fullscreenElement && document.exitFullscreen) {
-    document.exitFullscreen().catch(() => {});
-  }
-  $("#modal").classList.add("hidden"); $("#modalBody").innerHTML = ""; document.body.style.overflow = ""; render();
+  if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {});
+  if ($("#modal")) $("#modal").classList.add("hidden");
+  if ($("#modalBody")) $("#modalBody").innerHTML = "";
+  document.body.style.overflow = "";
+  render();
 }
 
 function drawModal() {
   if (!cur) return;
-  const d = get(cur), fav = favs.includes(cur.id), isTv = cur.k === "tv";
+  const d = get(cur);
+  const isFav = favs.some(f => String(f) === String(cur.id));
+  const isTv = cur.k === "tv";
   const epNum = (episodes[epIdx] && episodes[epIdx].episode_number) ? episodes[epIdx].episode_number : 1;
   const streamUrl = getStreamUrl(cur, season, epNum, currentServer);
+
+  /* Lock Screen Media Session Artwork Customizer */
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: d.title || 'AniCine Box',
+      artist: 'AniCine Box Stream',
+      artwork: [
+        { 
+          src: posterUrl(cur), 
+          sizes: '512x512', 
+          type: 'image/png' 
+        }
+      ]
+    });
+  }
 
   const player = `
     <div id="playerBox" class="relative w-full aspect-video bg-black group">
@@ -358,57 +552,62 @@ function drawModal() {
         allow="autoplay; encrypted-media; picture-in-picture; fullscreen" 
         referrerpolicy="no-referrer"
         allowfullscreen></iframe>
-      <button onclick="togglePlayerFullScreen()" class="absolute bottom-3 right-3 glass bg-black/80 text-white text-xs px-3 py-1.5 rounded-lg opacity-90 hover:opacity-100 transition z-10 font-medium">
-        <i class="fa-solid fa-expand mr-1"></i> Horizontal Fullscreen
+      <button id="playerFsBtn" onclick="togglePlayerFullScreen()" class="absolute bottom-3 right-3 glass bg-black/80 text-white text-xs px-3 py-1.5 rounded-lg opacity-90 hover:opacity-100 transition z-10 font-medium">
+        <i class="fa-solid fa-expand mr-1"></i> Fullscreen
       </button>
     </div>`;
 
   const serverChips = `
     <div class="flex flex-wrap items-center gap-2 mb-3">
       <span class="text-xs text-gray-400 font-semibold mr-1">Select Server:</span>
-      <button data-srv="3" class="h-8 px-3 rounded-full text-xs font-semibold transition ${currentServer === 3 ? "bg-crimson shadow-[0_0_10px_#e50914]" : "glass hover:text-electric"}">Server 3 (VidLink - Best Subtitle)</button>
+      <button data-srv="3" class="h-8 px-3 rounded-full text-xs font-semibold transition ${currentServer === 3 ? "bg-crimson shadow-[0_0_10px_#e50914]" : "glass hover:text-electric"}">Server 3 (VidLink)</button>
       <button data-srv="2" class="h-8 px-3 rounded-full text-xs font-semibold transition ${currentServer === 2 ? "bg-crimson shadow-[0_0_10px_#e50914]" : "glass hover:text-electric"}">Server 2 (AutoEmbed)</button>
       <button data-srv="1" class="h-8 px-3 rounded-full text-xs font-semibold transition ${currentServer === 1 ? "bg-crimson shadow-[0_0_10px_#e50914]" : "glass hover:text-electric"}">Server 1 (VidSrc)</button>
       <button data-srv="4" class="h-8 px-3 rounded-full text-xs font-semibold transition ${currentServer === 4 ? "bg-crimson shadow-[0_0_10px_#e50914]" : "glass hover:text-electric"}">Server 4 (2Embed)</button>
-      <button data-srv="5" class="h-8 px-3 rounded-full text-xs font-semibold transition ${currentServer === 5 ? "bg-crimson shadow-[0_0_10px_#e50914]" : "glass hover:text-electric"}">Server 5 (SmashyStream)</button>
+      <button data-srv="5" class="h-8 px-3 rounded-full text-xs font-semibold transition ${currentServer === 5 ? "bg-crimson shadow-[0_0_10px_#e50914]" : "glass hover:text-electric"}">Server 5 (Smashy)</button>
     </div>`;
 
-  const seasonChips = d.seasons.length > 1 ? `<div class="flex gap-2 overflow-x-auto no-sb mb-3">${d.seasons.map(s =>
+  const seasonChips = (d.seasons || []).length > 1 ? `<div class="flex gap-2 overflow-x-auto no-sb mb-3">${d.seasons.map(s =>
     `<button data-season="${s.season_number}" class="shrink-0 h-9 px-4 rounded-full text-sm font-semibold ${season === s.season_number ? "bg-crimson" : "glass"}">Season ${s.season_number}</button>`).join("")}</div>` : "";
   const ep = episodes[epIdx];
   const epPanel = isTv && HAS_KEY && episodes.length > 0 ? `<div class="mt-5"><p class="text-sm font-semibold mb-2">Episodes</p>${seasonChips}
     ${ep ? `<div class="glass rounded-xl p-3 mb-3 flex gap-3">
       ${ep.still_path ? `<img src="${IMG}w300${ep.still_path}" alt="" class="w-28 h-auto rounded-lg object-cover self-start hidden sm:block">` : ""}
       <div><p class="font-semibold text-sm">S${season}E${ep.episode_number} · ${esc(ep.name)}${ep.runtime ? ` <span class="text-gray-400 font-normal">· ${ep.runtime}m</span>` : ""}</p>
-      <p class="text-xs text-gray-300 mt-1">${esc(ep.overview || "No description available.")}</p>
-      <p class="text-xs text-gray-500 mt-1">${ep.air_date ? "Aired " + ep.air_date : ""}</p></div></div>` : ""}
+      <p class="text-xs text-gray-300 mt-1">${esc(ep.overview || "No description available.")}</p></div></div>` : ""}
     <div class="flex flex-wrap gap-2 max-h-40 overflow-y-auto">${episodes.map((e, n) =>
       `<button data-ep="${n}" title="${esc(e.name)}" class="h-10 min-w-[3rem] px-3 rounded-lg text-sm font-semibold ${epIdx === n ? "bg-crimson shadow-[0_0_12px_#e50914]" : "glass hover:text-electric"}">Ep ${e.episode_number}</button>`).join("")}</div></div>` : "";
   
-  const meta = [LABEL[cur.c], d.year, d.runtime ? d.runtime + " min" + (isTv ? "/ep" : "") : "", d.genres.join(", ")].filter(Boolean).join(" • ");
-  $("#modalBody").innerHTML = `
-    ${player}
-    <div class="p-5">
-      ${serverChips}
-      <div class="flex items-start justify-between gap-3">
-        <div><h2 class="text-2xl font-bold">${esc(d.title)}</h2>
-          <p class="text-sm text-gray-400 mt-1"><i class="fa-solid fa-star text-yellow-400"></i> ${d.rating} &bull; ${esc(meta)}</p></div>
-        <div class="flex gap-2 shrink-0">
-          <button data-act="fav" aria-label="Favorite" class="w-11 h-11 rounded-full glass ${fav ? "text-crimson" : ""}"><i class="fa-${fav ? "solid" : "regular"} fa-heart"></i></button>
-          <button data-act="share" aria-label="Share" class="w-11 h-11 rounded-full glass"><i class="fa-solid fa-share-nodes"></i></button>
-          <button data-act="close" aria-label="Close" class="w-11 h-11 rounded-full bg-crimson"><i class="fa-solid fa-xmark"></i></button>
-        </div></div>
-      <p class="text-gray-300 mt-3">${esc(d.overview)}</p>${epPanel}
-    </div>`;
+  const meta = [LABEL[cur.c], d.year, d.runtime ? d.runtime + " min" : "", (d.genres||[]).join(", ")].filter(Boolean).join(" • ");
+  
+  if ($("#modalBody")) {
+    $("#modalBody").innerHTML = `
+      ${player}
+      <div class="p-5">
+        ${serverChips}
+        <div class="flex items-start justify-between gap-3">
+          <div><h2 class="text-2xl font-bold">${esc(d.title)}</h2>
+            <p class="text-sm text-gray-400 mt-1"><i class="fa-solid fa-star text-yellow-400"></i> ${d.rating} &bull; ${esc(meta)}</p></div>
+          <div class="flex gap-2 shrink-0">
+            <button data-act="fav" aria-label="Favorite" class="w-11 h-11 rounded-full glass ${isFav ? "text-crimson" : ""}"><i class="fa-${isFav ? "solid" : "regular"} fa-heart"></i></button>
+            <button data-act="share" aria-label="Share" class="w-11 h-11 rounded-full glass"><i class="fa-solid fa-share-nodes"></i></button>
+            <button data-act="close" aria-label="Close" class="w-11 h-11 rounded-full bg-crimson"><i class="fa-solid fa-xmark"></i></button>
+          </div></div>
+        <p class="text-gray-300 mt-3 text-sm sm:text-base">${esc(d.overview)}</p>${epPanel}
+      </div>`;
+
+    resetFsBtnTimer();
+  }
 }
 
-function toast(m) { const t = $("#toast"); t.textContent = m; t.style.opacity = 1; setTimeout(() => t.style.opacity = 0, 1700); }
+function toast(m) { const t = $("#toast"); if (!t) return; t.textContent = m; t.style.opacity = 1; setTimeout(() => t.style.opacity = 0, 1700); }
 async function share() {
+  if (!cur) return;
   const data = {title: get(cur).title, text: `Check out ${get(cur).title} on MovieBox Hub`, url: location.href};
   try { if (navigator.share) await navigator.share(data); else { await navigator.clipboard.writeText(data.url); toast("Link copied"); } } catch (e) {}
 }
 
-/* ============ LIVE MULTI-API SEARCH WITH FALLBACK ============ */
+/* ============ SEARCH ============ */
 async function remoteSearch(q) {
   if (q.length < 2) { remote = []; searching = false; return render(); }
   searching = true; render();
@@ -416,7 +615,6 @@ async function remoteSearch(q) {
   let tmdbFound = false;
   const fresh = []; remote = [];
 
-  // ১. Primary Search: TMDB API
   if (HAS_KEY) {
     try {
       const r = await api("/search/multi", `&include_adult=false&query=${encodeURIComponent(q)}`);
@@ -436,15 +634,10 @@ async function remoteSearch(q) {
         });
         await Promise.allSettled(fresh.map(loadItem));
       }
-    } catch (e) {
-      console.warn("TMDB search failed, initiating fallback search...", e);
-    }
+    } catch (e) {}
   }
 
-  // ২. Fallback Search: TMDB-তে না পাওয়া গেলে Jikan (Anime) এবং TVMaze (Drama/TV) তে খুঁজবে
   if (!tmdbFound && q === query.trim()) {
-
-    // Fallback A: Jikan API (অ্যানিমে সার্চের জন্য)
     if (tab === "anime" || tab === "all") {
       try {
         const jikanRes = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(q)}&limit=6`);
@@ -458,26 +651,18 @@ async function remoteSearch(q) {
               items.push(it);
             }
             info[customId] = {
-              title: x.title,
-              year: x.year || (x.aired && x.aired.from ? x.aired.from.slice(0, 4) : ""),
-              rating: x.score ? x.score.toFixed(1) : "–",
-              overview: x.synopsis || "No synopsis available.",
+              title: x.title, year: x.year || (x.aired?.from ? x.aired.from.slice(0, 4) : ""),
+              rating: x.score ? x.score.toFixed(1) : "–", overview: x.synopsis || "No synopsis available.",
               posterUrl: x.images?.jpg?.large_image_url || x.images?.jpg?.image_url,
-              backdrop: null,
-              genres: (x.genres || []).map(g => g.name),
-              runtime: x.duration ? parseInt(x.duration) : null,
-              seasons: [],
-              pop: x.members || 0
+              backdrop: null, genres: (x.genres || []).map(g => g.name), runtime: x.duration ? parseInt(x.duration) : null,
+              seasons: [], pop: x.members || 0
             };
             remote.push(customId);
           });
         }
-      } catch (e) {
-        console.warn("Jikan Fallback Failed:", e);
-      }
+      } catch (e) {}
     }
 
-    // Fallback B: TVMaze API (কে-ড্রামা ও টিভি সিরিজের জন্য)
     if (remote.length === 0 && (tab === "drama" || tab === "all" || tab === "movie")) {
       try {
         const tvmRes = await fetch(`https://api.tvmaze.com/search/shows?q=${encodeURIComponent(q)}`);
@@ -492,24 +677,16 @@ async function remoteSearch(q) {
               items.push(it);
             }
             info[customId] = {
-              title: x.name,
-              year: x.premiered ? x.premiered.slice(0, 4) : "",
-              rating: x.rating && x.rating.average ? x.rating.average.toFixed(1) : "–",
+              title: x.name, year: x.premiered ? x.premiered.slice(0, 4) : "",
+              rating: x.rating?.average ? x.rating.average.toFixed(1) : "–",
               overview: x.summary ? x.summary.replace(/<[^>]*>/g, '') : "No synopsis available.",
-              posterUrl: x.image?.original || x.image?.medium,
-              backdrop: null,
-              genres: x.genres || [],
-              runtime: x.runtime || null,
-              seasons: [],
-              pop: 0,
-              imdbId: x.externals?.imdb || null
+              posterUrl: x.image?.original || x.image?.medium, backdrop: null, genres: x.genres || [],
+              runtime: x.runtime || null, seasons: [], pop: 0, imdbId: x.externals?.imdb || null
             };
             remote.push(customId);
           });
         }
-      } catch (e) {
-        console.warn("TVMaze Fallback Failed:", e);
-      }
+      } catch (e) {}
     }
   }
 
@@ -526,28 +703,35 @@ document.addEventListener("click", e => {
   else if (act) {
     if (act.dataset.act === "close") closeModal();
     if (act.dataset.act === "share") share();
-    if (act.dataset.act === "fav") {
-      favs = favs.includes(cur.id) ? favs.filter(x => x !== cur.id) : [...favs, cur.id];
-      saveFavs(); toast(favs.includes(cur.id) ? "Added to favorites" : "Removed from favorites"); drawModal();
+    if (act.dataset.act === "fav" && cur) {
+      const exists = favs.some(f => String(f) === String(cur.id));
+      favs = exists ? favs.filter(x => String(x) !== String(cur.id)) : [...favs, cur.id];
+      saveFavs(); toast(favs.some(f => String(f) === String(cur.id)) ? "Added to favorites" : "Removed from favorites"); drawModal();
     }
   }
   else if (seasonBtn) loadSeason(+seasonBtn.dataset.season);
   else if (epBtn) { epIdx = +epBtn.dataset.ep; drawModal(); }
   else if (card && !card.closest("#modal")) {
     const rawId = card.dataset.id;
-    const numId = Number(rawId);
-    openModal(isNaN(numId) ? rawId : numId);
+    openModal(rawId);
   }
   else if (t.id === "modal") closeModal();
 });
 
-$("#search").addEventListener("input", e => {
-  query = e.target.value; if (tab === "about") tab = "all"; if (query.trim().length < 2) remote = []; render();
-  clearTimeout(timer); timer = setTimeout(() => remoteSearch(query.trim()), 350);
-});
-document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#modal").classList.contains("hidden")) closeModal(); });
+const searchInput = $("#search");
+if (searchInput) {
+  searchInput.addEventListener("input", e => {
+    query = e.target.value; if (tab === "about") tab = "all"; if (query.trim().length < 2) remote = []; render();
+    clearTimeout(timer); timer = setTimeout(() => remoteSearch(query.trim()), 350);
+  });
+}
+document.addEventListener("keydown", e => { if (e.key === "Escape" && $("#modal") && !$("#modal").classList.contains("hidden")) closeModal(); });
 
-renderHero(); render(); loadAll();
+/* ============ INITIALIZATION ============ */
+initTheme();
+renderHero();
+render();
+loadAll();
 </script>
 </body>
 </html>
