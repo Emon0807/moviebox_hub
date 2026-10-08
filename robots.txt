@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://anicinebox.ai-tex-tool.workers.dev/sitemap.xml
