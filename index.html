@@ -6,8 +6,8 @@
 <title>AniCine Box - Watch Anime, Movies & Dramas Free in HD</title>
 
 <!-- SEO Meta Tags -->
-<meta name="description" content="Stream your favorite Anime, Movies, and Asian Dramas in HD quality for free on AniCine Box. Fast multi-server streaming portal.[span_0](start_span)[span_0](end_span)">
-<meta name="keywords" content="AniCine Box, AniCineBox, watch anime online, free movie streaming, kdrama watch free, moviebox[span_1](start_span)[span_1](end_span)">
+<meta name="description" content="Stream your favorite Anime, Movies, and Asian Dramas in HD quality for free on AniCine Box. Fast multi-server streaming portal.">
+<meta name="keywords" content="AniCine Box, AniCineBox, watch anime online, free movie streaming, kdrama watch free, moviebox">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://anicinebox.ai-tex-tool.workers.dev/">
 
@@ -15,14 +15,14 @@
 <!-- Open Graph / Social Sharing Meta Tags -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="AniCine Box - Stream Movies & Anime Free">
-<meta property="og:description" content="Watch high quality Anime, Movies, and Dramas for free with multi-server options.[span_2](start_span)[span_2](end_span)">
+<meta property="og:description" content="Watch high quality Anime, Movies, and Dramas for free with multi-server options.">
 <meta property="og:image" content="https://image.tmdb.org/t/p/w1280/1Xko2X4qfQ1y.jpg">
-<meta property="og:url" content="https://yourwebsite.com/">
+<meta property="og:url" content="https://anicinebox.ai-tex-tool.workers.dev/">
 
 <!-- Twitter Card Tags -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="AniCine Box - Stream Movies & Anime Free">
-<meta name="twitter:description" content="Stream popular movies, dramas, and anime online free in HD.[span_3](start_span)[span_3](end_span)">
+<meta name="twitter:description" content="Stream popular movies, dramas, and anime online free in HD.">
 <meta name="twitter:image" content="https://image.tmdb.org/t/p/w1280/1Xko2X4qfQ1y.jpg">
 
 <!-- Favicon Icon -->
@@ -130,8 +130,8 @@
 </main>
 
 <footer class="text-center text-xs text-gray-500 px-4 py-8 border-t border-white/5 space-y-1">
-  <p>This product uses TMDB, Jikan, and TVMaze APIs for fallback metadata search.[span_4](start_span)[span_4](end_span)</p>
-  <p>Streaming powered by multi-server embed integration.[span_5](start_span)[span_5](end_span)</p>
+  <p>This product uses TMDB, Jikan, and TVMaze APIs for fallback metadata search.</p>
+  <p>Streaming powered by multi-server embed integration.</p>
 </footer>
 
 <div id="modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-3 sm:p-6">
@@ -398,7 +398,7 @@ function visible() {
   return items.filter(it => {
     if (!it) return false;
     const d = get(it);
-    const tabOk = tab === "all" || tab === it.c || (tab === "trending" && hot.includes(Number(it.id))) || (tab === "favs" && favs.some(f => String(f) === String(it.id)));
+    const tabOk = tab === "all" || tab === c || (tab === "trending" && hot.includes(Number(it.id))) || (tab === "favs" && favs.some(f => String(f) === String(it.id)));
     if (it.extra && !favs.some(f => String(f) === String(it.id)) && !(q && remote.some(r => String(r) === String(it.id)))) return false;
     const searchString = `${d.title} ${(d.genres||[]).join(" ")} ${LABEL[it.c] || ""}`.toLowerCase();
     return tabOk && (!q || remote.some(r => String(r) === String(it.id)) || searchString.includes(q));
@@ -412,7 +412,7 @@ function render() {
       `<button data-tab="${k}" class="shrink-0 h-10 px-4 rounded-full text-sm font-semibold inline-flex items-center justify-center gap-2 transition ${tab === k ? "bg-crimson shadow-[0_0_16px_#e50914] text-white" : "glass text-gray-300 hover:text-white"}"><i class="${icon} text-xs"></i><span>${n}</span></button>`
     ).join("");
   }
-  
+
   const isAbout = tab === "about";
   if ($("#about")) $("#about").classList.toggle("hidden", !isAbout);
   if ($("#heading")) $("#heading").classList.toggle("hidden", isAbout);
@@ -658,9 +658,9 @@ function drawModal() {
       <p class="text-xs text-gray-300 mt-1">${esc(ep.overview || "No description available.")}</p></div></div>` : ""}
     <div class="flex flex-wrap gap-2 max-h-40 overflow-y-auto">${episodes.map((e, n) =>
       `<button data-ep="${n}" title="${esc(e.name)}" class="h-10 min-w-[3rem] px-3 rounded-lg text-sm font-semibold ${epIdx === n ? "bg-crimson shadow-[0_0_12px_#e50914]" : "glass hover:text-electric"}">Ep ${e.episode_number}</button>`).join("")}</div></div>` : "";
-  
+
   const meta = [LABEL[cur.c], d.year, d.runtime ? d.runtime + " min" : "", (d.genres||[]).join(", ")].filter(Boolean).join(" • ");
-  
+
   if ($("#modalBody")) {
     $("#modalBody").innerHTML = `
       ${player}
@@ -701,7 +701,7 @@ async function remoteSearch(q) {
       const r = await api("/search/multi", `&include_adult=false&query=${encodeURIComponent(q)}`);
       if (q !== query.trim()) return;
       const results = (r.results || []).filter(x => (x.media_type === "movie" || x.media_type === "tv") && x.poster_path);
-      
+
       if (results.length > 0) {
         tmdbFound = true;
         results.slice(0, 15).forEach(x => {
