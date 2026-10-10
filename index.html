@@ -193,7 +193,7 @@ const PROFILE = {
 };
 
 /* ============ STATE & HELPERS ============ */
-let tab = "all", query = "", cur = null, season = 1, episodes = [], epIdx = 0, currentServer = 3;
+let tab = "all", query = "", cur = null, season = 1, episodes = [], epIdx = 0, currentServer = 1;
 const info = {};
 let hot = [];
 let remote = [], searching = false, timer;
@@ -577,7 +577,7 @@ function resetFsBtnTimer() {
 
 /* ============ EMBEDDED MODAL ============ */
 function openModal(id) {
-  cur = item(id); season = 1; episodes = []; epIdx = 0; currentServer = 3;
+  cur = item(id); season = 1; episodes = []; epIdx = 0; currentServer = 1;
   if ($("#modal")) $("#modal").classList.remove("hidden");
   document.body.style.overflow = "hidden";
 
