@@ -45,6 +45,12 @@
   .text-electric { color: #00f2fe; }
 
   body { background: #0a0d14; color: #ffffff; overflow-x: hidden; transition: background-color 0.3s ease, color 0.3s ease; min-height: 100vh; margin: 0; }
+  
+  /* Fix ad script invisible overlays blocking touch/scroll */
+  header { pointer-events: auto !important; z-index: 9999 !important; }
+  #tabs { pointer-events: auto !important; touch-action: pan-x; }
+  #tabs button { pointer-events: auto !important; }
+
   .glass { background: rgba(255,255,255,.06); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,.1); transition: all 0.3s ease; }
   .card { transition: transform .3s, box-shadow .3s; }
   .card:hover { transform: translateY(-4px) scale(1.04); box-shadow: 0 0 22px rgba(229,9,20,.55), 0 0 38px rgba(0,242,254,.22); }
@@ -180,9 +186,7 @@ const PROFILE = {
   bio: "A passionate web developer learning and building modern, mobile-first web platforms and dynamic media portals.",
   links: [
     {icon: "fa-brands fa-facebook-f", label: "Facebook", url: "https://www.facebook.com/obito.uchiha.0003"},
-    {icon: "fa-brands fa-instagram",   label: "Instagram", url: "https://www.instagram.com/emon.alone.0000?mdxt=MTE0OG45b2dhdTRicw=="},
-  //{icon: "fa-brands fa-github",      label: "GitHub",   url: "https://github.com/"},
-  //{icon: "fa-solid fa-envelope",     label: "Email",    url: "mailto:you@example.com"}
+    {icon: "fa-brands fa-instagram",   label: "Instagram", url: "https://www.instagram.com/emon.alone.0000?mdxt=MTE0OG45b2dhdTRicw=="}
   ]
 };
 
