@@ -65,14 +65,12 @@
 
   body { background: #0a0d14; color: #ffffff; overflow-x: hidden; transition: background-color 0.3s ease, color 0.3s ease; min-height: 100vh; margin: 0; }
 
-  /* Fix ad script invisible overlays blocking touch/scroll */
   header { pointer-events: auto !important; z-index: 9999 !important; }
   #tabs { pointer-events: auto !important; touch-action: pan-x; }
   #tabs button { pointer-events: auto !important; }
 
   .glass { background: rgba(255,255,255,.06); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,.1); transition: all 0.3s ease; }
 
-  /* FIX: modal must sit above the header, and no blur on the player container (prevents freeze/black screen) */
   #modal { z-index: 10000 !important; overscroll-behavior: contain; }
   #modalBody { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background-color: #0a0d14 !important; }
   #toast { z-index: 10001 !important; }
@@ -233,7 +231,6 @@ const saveFavs = () => {
 
 try { (JSON.parse(safeGet("mbh_extra", "[]")) || []).forEach(x => { if (x && !item(x.id)) items.push(x); }); } catch (e) {}
 
-/* ============ ROUTING & URL CLEANUP ============ */
 function setRoute(path, push = true) {
   if (push && window.location.pathname !== path) {
     history.pushState(null, "", path);
@@ -340,13 +337,12 @@ function getStreamUrl(curItem, sN, epN, server) {
   const isTv = curItem.k === "tv";
   const d = info[curItem.id] || {};
   const streamId = d.imdbId || curItem.id;
-  const isImdb = String(streamId).startsWith("tt");
 
   switch (server) {
     case 1:
       return isTv 
-        ? `https://vidsrc.me/embed/tv?${isImdb ? 'imdb' : 'tmdb'}=${streamId}&season=${sN}&episode=${epN}` 
-        : `https://vidsrc.me/embed/movie?${isImdb ? 'imdb' : 'tmdb'}=${streamId}`;
+        ? `https://vidsrc.me/embed/tv?tmdb=${streamId}&season=${sN}&episode=${epN}` 
+        : `https://vidsrc.me/embed/movie?tmdb=${streamId}`;
     case 2:
       return isTv 
         ? `https://player.autoembed.cc/embed/tv/${streamId}/${sN}/${epN}` 
@@ -395,14 +391,20 @@ async function loadItem(it) {
   try {
     const d = await api(`/${it.k}/${it.id}`, "&append_to_response=videos,external_ids&include_video_language=en,null");
     info[it.id] = {
-      title: d.title || d.name, year: (d.release_date || d.first_air_date || "").slice(0, 4),
-      rating: d.vote_average ? d.vote_average.toFixed(1) : "–", overview: d.overview || "No synopsis available.",
+      title: d.title || d.name || it.t, 
+      year: (d.release_date || d.first_air_date || "").slice(0, 4),
+      rating: d.vote_average ? d.vote_average.toFixed(1) : "–", 
+      overview: d.overview || "No synopsis available.",
       poster: d.poster_path, backdrop: d.backdrop_path, genres: (d.genres || []).map(g => g.name),
       runtime: d.runtime || (d.episode_run_time || [])[0] || null,
       seasons: (d.seasons || []).filter(s => s.season_number > 0), pop: d.popularity || 0,
       imdbId: d.external_ids?.imdb_id || null
     };
-  } catch (e) {}
+  } catch (e) {
+    if (!info[it.id]) {
+      info[it.id] = { title: it.t || "Untitled", year: "", rating: "–", overview: "No synopsis available.", poster: null, genres: [], seasons: [] };
+    }
+  }
 }
 
 async function loadAll() {
@@ -625,9 +627,14 @@ function resetFsBtnTimer() {
   }, { passive: true });
 });
 
-function openModal(id, pushState = true) {
+async function openModal(id, pushState = true) {
   cur = item(id); season = 1; episodes = []; epIdx = 0; currentServer = 1;
   if (!cur) { history.replaceState(null, "", "/"); tab = "all"; render(); return; }
+  
+  if (HAS_KEY && (!info[cur.id] || !info[cur.id].overview || info[cur.id].overview === "No synopsis available.")) {
+    await loadItem(cur);
+  }
+
   if ($("#modal")) $("#modal").classList.remove("hidden");
   document.body.style.overflow = "hidden";
 
@@ -822,7 +829,6 @@ async function remoteSearch(q) {
   if (q === query.trim()) { searching = false; render(); }
 }
 
-/* ============ EVENT LISTENERS ============ */
 document.addEventListener("click", e => {
   const t = e.target, 
         tabBtn = t.closest("[data-tab]"), 
